@@ -65,6 +65,8 @@ master
 
   - Git Issue PR #825: bigdec: don't read past end in to_bigdec when digits are missing
 
+  - Git Issue PR #826: jmespath: evaluate a parenthesized expression with a pipe as one operand
+
 - Changes:
 
   - Until 1.11.0, the CBOR parser converted bigfloats to a hexadecimal 
@@ -79,6 +81,8 @@ master
   - `semantic_tag::bigfloat` has been removed
 
 - Enhancements:
+
+  - New cbor::ondemand API contributed by ky438 
 
   - New cbor decode option **bigfloat_precision**, defaults to 34.
 

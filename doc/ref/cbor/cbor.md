@@ -4,6 +4,8 @@ The cbor extension implements decode from and encode to the IETF standard [Conci
 You can either parse into or serialize from a [basic_json](../corelib/basic_json.md), or your own
 types that have [reflection traits](../corelib/reflection-traits.md) defined.
 
+[cbor::ondemand](ondemand/ondemand.md) (experimental)
+
 [decode_cbor, try_decode_cbor](decode_cbor.md)
 
 [basic_cbor_cursor](basic_cbor_cursor.md)
@@ -15,8 +17,6 @@ types that have [reflection traits](../corelib/reflection-traits.md) defined.
 [cbor_options](cbor_options.md)
 
 [Typed Arrays](typed_arrays.md)
-
-[cbor::ondemand](ondemand/ondemand.md) (experimental)
 
 ### Tag handling and extensions
 

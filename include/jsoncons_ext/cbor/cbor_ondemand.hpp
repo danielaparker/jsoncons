@@ -203,16 +203,16 @@ namespace ondemand_detail {
     {
         cbor::cbor_major_type major_type{};
         uint8_t additional_info{0};
-        uint64_t value{0};
         mutable std::atomic<bool> valid_utf8{};
+        uint64_t value{0};
 
         item_head() noexcept = default;
 
         item_head(const item_head& other)
             : major_type(other.major_type),
               additional_info(other.additional_info),
-              value(other.value),
-              valid_utf8(other.valid_utf8.load(std::memory_order_relaxed))
+              valid_utf8(other.valid_utf8.load(std::memory_order_relaxed)),
+              value(other.value)
         {
         }
 
@@ -922,6 +922,10 @@ namespace ondemand_detail {
 // Iterates an item's leading tag numbers.
 class cbor_item::tag_iterator
 {
+
+    const uint8_t* pos_{nullptr};    // nullptr when exhausted
+    const uint8_t* stop_{nullptr};   // first byte of the untagged head
+    uint64_t value_{0};
 public:
     using value_type = uint64_t;
     using reference = uint64_t;
@@ -929,7 +933,7 @@ public:
     using difference_type = std::ptrdiff_t;
     using iterator_category = std::input_iterator_tag;
 
-    tag_iterator() noexcept : pos_(nullptr), stop_(nullptr), value_(0) {}
+    tag_iterator() noexcept = default;
 
     uint64_t operator*() const noexcept
     {
@@ -985,14 +989,12 @@ private:
         value_ = head.value;
         pos_ = p;
     }
-
-    const uint8_t* pos_;    // nullptr when exhausted
-    const uint8_t* stop_;   // first byte of the untagged head
-    uint64_t value_;
 };
 
 class cbor_item::tag_range
 {
+    const uint8_t* first_{nullptr};
+    const uint8_t* stop_{nullptr};
 public:
     using iterator = tag_iterator;
     using const_iterator = tag_iterator;
@@ -1004,9 +1006,6 @@ public:
 private:
     friend class cbor_item;
     tag_range(const uint8_t* first, const uint8_t* stop) noexcept : first_(first), stop_(stop) {}
-
-    const uint8_t* first_;
-    const uint8_t* stop_;
 };
 
 inline cbor_item::tag_range cbor_item::tags() const noexcept
@@ -1019,6 +1018,12 @@ inline cbor_item::tag_range cbor_item::tags() const noexcept
 // definite-length container ends where its parent does, so is not measured.
 class cbor_item::child_iterator
 {
+    const uint8_t* pos_;    // current child's begin, nullptr when exhausted
+    const uint8_t* next_;   // current child's end, the next child's begin
+    const uint8_t* end_;    // the parent's end
+    uint64_t remaining_;    // raw children left; indefinite ends at a break
+    ondemand_detail::item_head head_;
+    const uint8_t* content_;
 public:
     using value_type = cbor_item;
     using reference = cbor_item;
@@ -1100,17 +1105,13 @@ private:
         content_ = p;
         next_ = remaining_ == 0 ? end_ : ondemand_detail::skip_checked(p, end_, head_);
     }
-
-    const uint8_t* pos_;    // current child's begin, nullptr when exhausted
-    const uint8_t* next_;   // current child's end, the next child's begin
-    const uint8_t* end_;    // the parent's end
-    uint64_t remaining_;    // raw children left; indefinite ends at a break
-    ondemand_detail::item_head head_;
-    const uint8_t* content_;
 };
 
 class cbor_item::child_range
 {
+    const uint8_t* first_{nullptr};
+    const uint8_t* end_{nullptr};
+    uint64_t remaining_{0};
 public:
     using iterator = child_iterator;
     using const_iterator = child_iterator;
@@ -1138,10 +1139,6 @@ private:
         : first_(first), end_(end), remaining_(remaining)
     {
     }
-
-    const uint8_t* first_;
-    const uint8_t* end_;
-    uint64_t remaining_;
 };
 
 inline cbor_item::child_range cbor_item::children() const noexcept
