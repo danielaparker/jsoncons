@@ -2,8 +2,10 @@
 // Distributed under Boost license
 
 #include <jsoncons_ext/cbor/cbor_ondemand.hpp>
+#include <jsoncons/utility/byte_string.hpp>
 #include <iostream>
 #include <vector>
+#include <string>
 
 namespace cbor = jsoncons::cbor;
 
@@ -47,6 +49,44 @@ int cbor_ondemand_example()
             std::cout << key << ": " << value << "\n";
         }
         is_key = !is_key;
+    }
+    return 0;
+}
+
+int indefinite_length_byte_string()
+{
+    std::vector<uint8_t> data = {
+        0x5F,                   // Start indefinite-length byte string
+        0x42, 0x01, 0x02,       // Chunk 1: 2 bytes
+        0x43, 0x03, 0x04, 0x05, // Chunk 2: 3 bytes
+        0xFF                    // Break
+    };
+
+    auto r = cbor::ondemand::read_item(data);
+    auto r1 = (*r).get_byte_string();
+    if (r1)
+    {
+        std::cout << "(1) ";
+        jsoncons::print_bytes(*r1, std::cout);
+        std::cout << "\n";
+    }
+    else
+    {
+        std::cout << "(1) " << r1.error().message() << "\n";
+    }
+    std::cout << "\n";
+
+    std::vector<uint8_t> buf;
+    auto r2 = (*r).get_byte_string(buf);
+    if (r2)
+    {
+        std::cout << "(2) ";
+        jsoncons::print_bytes(buf, std::cout);
+        std::cout << "\n";
+    }
+    else
+    {
+        std::cout << "(2) " << r2.error().message() << "\n";
     }
     return 0;
 }
@@ -100,6 +140,8 @@ int main()
     std::cout << "cbor::ondemand examples\n\n";
 
     cbor_ondemand_example();
+    std::cout << "\n";
+    indefinite_length_byte_string();
     std::cout << "\n";
     definite_length_string_invalid_utf8();
     std::cout << "\n";
