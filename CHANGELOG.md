@@ -55,6 +55,16 @@ master
 
   - Git Issue PR #820: reflect: reject std::array input with the wrong number of elements
 
+  - Git Issue PR #820: reflect: reject std::array input with the wrong number of elements
+
+  - Git Issue PR #822: reflect: check the size of a json array before converting it to std::tuple
+
+  - Git Issue PR #823: jsonpointer: decide whether a level is an array before unflattening it
+
+  - Git Issue PR #824: toon: avoid unescaping a quoted key twice
+
+  - Git Issue PR #825: bigdec: don't read past end in to_bigdec when digits are missing
+
 - Changes:
 
   - Until 1.11.0, the CBOR parser converted bigfloats to a hexadecimal 
