@@ -282,6 +282,19 @@ TEST_CASE("jmespath pipe binds more loosely than or, and, not and comparisons")
     CHECK(jmespath::search(doc, "(a || b) | c") == json(5));
 }
 
+TEST_CASE("jmespath pipe inside parentheses")
+{
+    auto doc = json::parse(R"({"a":{"c":5},"b":{"c":7},"x":1})");
+
+    CHECK(jmespath::search(doc, "(a | c) == `5`") == json(true));
+    CHECK(jmespath::search(doc, "`5` == (a | c)") == json(true));
+    CHECK(jmespath::search(doc, "(a | c) < (b | c)") == json(true));
+    CHECK(jmespath::search(doc, "x && (b | c)") == json(7));
+    CHECK(jmespath::search(doc, "(a | c) == `5` && x") == json(1));
+    CHECK(jmespath::search(doc, "[(a | c), x]") == json::parse("[5,1]"));
+    CHECK(jmespath::search(doc, "b | (c)") == json(7));
+}
+
 TEST_CASE("jmespath unbalanced right parenthesis")
 {
     std::vector<std::string> exprs = {"a)", "a)b", "@)", "foo.bar)baz", "(a))", "a | b)"};

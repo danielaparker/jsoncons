@@ -3666,6 +3666,7 @@ namespace detail {
         const char_type* input_end_{nullptr};
         const char_type* p_{nullptr};
         std::vector<token<Json>> operator_stack_;
+        std::vector<std::size_t> paren_starts_;
 
     public:
         jmespath_evaluator()
@@ -3876,6 +3877,7 @@ namespace detail {
                             {
                                 ++p_;
                                 ++column_;
+                                paren_starts_.push_back(output_stack.size());
                                 push_token(lparen_arg, resources, output_stack, ec);
                                 if (JSONCONS_UNLIKELY(ec)) {return jmespath_expression{};}
                                 state_stack.back() = expr_state::expect_rparen;
@@ -5498,7 +5500,26 @@ namespace detail {
                     break;
                 case token_kind::rparen:
                     {
+                        JSONCONS_ASSERT(!paren_starts_.empty());
+                        std::size_t start = paren_starts_.back();
+                        paren_starts_.pop_back();
+                        JSONCONS_ASSERT(start <= output_stack.size());
+                        // A pipe sets the current node for every token after it, so a
+                        // parenthesized expression holding one is wrapped up on its own.
+                        bool has_pipe = std::any_of(output_stack.begin() + start, output_stack.end(),
+                            [](const token<Json>& t) { return t.type() == token_kind::pipe; });
                         unwind_rparen(resources, output_stack, ec);
+                        if (has_pipe && !ec)
+                        {
+                            std::vector<token<Json>> toks(std::make_move_iterator(output_stack.begin() + start),
+                                std::make_move_iterator(output_stack.end()));
+                            output_stack.erase(output_stack.begin() + start, output_stack.end());
+                            if (toks.front().type() != token_kind::literal)
+                            {
+                                toks.insert(toks.begin(), token<Json>(current_node_arg));
+                            }
+                            output_stack.push_back(resources.create_expression(function_expression(std::move(toks))));
+                        }
                         break;
                     }
                 case token_kind::end_function:
