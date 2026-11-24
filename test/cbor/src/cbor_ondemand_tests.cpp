@@ -779,9 +779,13 @@ TEST_CASE("cbor ondemand at tests")
         auto bar = (*result).at(jsoncons::string_view("bar"));
         REQUIRE_FALSE(bar);
         CHECK(cbor::ondemand::access_errc::invalid_type == bar.error().code());
+
+        auto r = (*result).at(4u);
+        REQUIRE_FALSE(r);
+        CHECK(cbor::ondemand::access_errc::result_out_of_range == r.error().code());
     }
 
-    SECTION("test 2")
+    SECTION("mapped item by string key")
     {
         const std::vector<uint8_t> data = {
     0xA3,                         // Map with 3 key-value pairs
@@ -800,5 +804,44 @@ TEST_CASE("cbor ondemand at tests")
         auto val = (*bar).get_uint64();
         REQUIRE(val);
         CHECK(2 == *val);
+    }
+
+    SECTION("mapped item by unsigned integer key")
+    {
+        const std::vector<uint8_t> data = {
+    0xA3,       // Map with 3 key-value pairs
+    0x01,       // Key: unsigned integer 1
+    0x0A,       // Value: 10
+    0x02,       // Key: unsigned integer 2
+    0x14,       // Value: 20
+    0x03,       // Key: unsigned integer 3
+    0x18, 0x1E  // Value: 30
+        };
+
+        auto result = cbor::ondemand::read_item(data);
+        REQUIRE(result);
+        auto bar = (*result).at(2u);
+        REQUIRE(bar);
+        auto val = (*bar).get_uint64();
+        REQUIRE(val);
+        CHECK(20 == *val);
+    }
+
+    SECTION("array item by unsigned integer index")
+    {
+        const std::vector<uint8_t> data = {
+    0x83,       // Array with 3 elements
+    0x01,       // Value: 1
+    0x02,       // Value: 2
+    0x03        // Value: 3
+        };
+
+        auto result = cbor::ondemand::read_item(data);
+        REQUIRE(result);
+        auto r = (*result).at(2u);
+        REQUIRE(r);
+        auto val = (*r).get_uint64();
+        REQUIRE(val);
+        CHECK(3 == *val);
     }
 }

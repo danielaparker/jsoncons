@@ -128,7 +128,7 @@ int main()
     }
     else
     {
-        std::cout << "(1) " << r1.error().message() << "\n";
+        std::cout << "(1) " << bstr.error().message() << "\n";
     }
     std::cout << "\n";
 
