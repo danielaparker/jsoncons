@@ -12,12 +12,13 @@ class access_error;
 
 #### Member constants
 
-Name                  | Definition 
-----------------------|---------------
+Name                    | Definition 
+------------------------|---------------
 `invalid_type`          | Attempting to acces an item of the wrong type
 `indefinite`            | Cannot access a view of an item with indefinite length
 `result_out_of_range`   | A numeric item is out of range 
 `invalid_utf8`          | Invalid UTF-8
+`key_not_found`         | Key not found
 
 ### class access_error
 

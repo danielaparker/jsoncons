@@ -84,6 +84,14 @@ indefinite-length strings into the provided buffer.</td>
     <td>Copying get_byte_string overload, assembles
 indefinite-length strings into the provided buffer.</td> 
   </tr>
+  <tr>
+    <td><code>template &lt;typename StringViewLike&gt;<br/>access_result&lt;cbor_view> at(StringViewLike key) const</code></td>
+    <td>Returns item if found, otherwise error.</td> 
+  </tr>
+  <tr>
+    <td>access_result&lt;cbor_view> at(const char* key) const</code></td>
+    <td>Returns item if found, otherwise error.</td> 
+  </tr>
 </table>
 
 ### Examples
@@ -214,4 +222,61 @@ Output:
 
 ```
 Invalid UTF-8 at position 0
+```
+
+#### Try to access indefinite length string containing invalid UTF-8
+
+```cpp
+#include <jsoncons_ext/cbor/cbor_ondemand.hpp>
+#include <iostream>
+#include <vector>
+#include <string>
+
+int main()
+{
+    const std::vector<uint8_t> data = {
+0xA3,                         // Map with 3 key-value pairs
+0x63, 0x66, 0x6F, 0x6F,       // Key: "foo"
+0x01,                         // Value: 1
+0x63, 0x62, 0x61, 0x72,       // Key: "bar"
+0x02,                         // Value: 2
+0x63, 0x62, 0x61, 0x7A,       // Key: "baz"
+0x03                          // Value: 3
+    };
+
+    auto result = cbor::ondemand::read_item(data);   
+    if (!result)
+    {
+        return -1;
+    }
+    if (auto item = (*result).at("bar"); item)
+    {
+        if (auto val = (*item).get_uint64(); val)
+        {
+            std::cout << "(1) " << *val << "\n";
+        }
+    }
+    else
+    {
+        std::cout << "(1) " << item.error().message() << "\n";
+    }
+    if (auto item = (*result).at("qux"); item)
+    {
+        if (auto val = (*item).get_uint64(); val)
+        {
+            std::cout << "(2) " << *val << "\n";
+        }
+    }
+    else
+    {
+        std::cout << "(2) " << item.error().message() << "\n";
+    }
+    return 0;
+}
+```
+Output:
+
+```
+(1) 2
+(2) Key not found at position 0
 ```

@@ -795,6 +795,10 @@ TEST_CASE("cbor ondemand at tests")
 
         auto result = cbor::ondemand::read_item(data);
         REQUIRE(result);
-        auto bar = (*result).at(jsoncons::string_view("bar"));
+        auto bar = (*result).at("bar");
+        REQUIRE(bar);
+        auto val = (*bar).get_uint64();
+        REQUIRE(val);
+        CHECK(2 == *val);
     }
 }

@@ -135,6 +135,48 @@ int indefinite_length_string_invalid_utf8()
     return 0;
 }
 
+int at_example()
+{
+    const std::vector<uint8_t> data = {
+0xA3,                         // Map with 3 key-value pairs
+0x63, 0x66, 0x6F, 0x6F,       // Key: "foo"
+0x01,                         // Value: 1
+0x63, 0x62, 0x61, 0x72,       // Key: "bar"
+0x02,                         // Value: 2
+0x63, 0x62, 0x61, 0x7A,       // Key: "baz"
+0x03                          // Value: 3
+    };
+
+    auto result = cbor::ondemand::read_item(data);   
+    if (!result)
+    {
+        return -1;
+    }
+    if (auto item = (*result).at("bar"); item)
+    {
+        if (auto val = (*item).get_uint64(); val)
+        {
+            std::cout << "(1) " << *val << "\n";
+        }
+    }
+    else
+    {
+        std::cout << "(1) " << item.error().message() << "\n";
+    }
+    if (auto item = (*result).at("qux"); item)
+    {
+        if (auto val = (*item).get_uint64(); val)
+        {
+            std::cout << "(2) " << *val << "\n";
+        }
+    }
+    else
+    {
+        std::cout << "(2) " << item.error().message() << "\n";
+    }
+    return 0;
+}
+
 int main()
 {
     std::cout << "cbor::ondemand examples\n\n";
@@ -146,5 +188,7 @@ int main()
     definite_length_string_invalid_utf8();
     std::cout << "\n";
     indefinite_length_string_invalid_utf8();
+    std::cout << "\n";
+    at_example();
 }
 

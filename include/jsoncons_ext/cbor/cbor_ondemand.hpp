@@ -38,7 +38,8 @@ enum class access_errc
     invalid_type = 1,
     indefinite,
     invalid_utf8,
-    result_out_of_range, 
+    result_out_of_range,
+    key_not_found, 
 };
 
 class access_error_category_impl
@@ -63,6 +64,8 @@ public:
                 return "Result out of range";
             case access_errc::invalid_utf8:
                 return "Invalid UTF-8";
+            case access_errc::key_not_found:
+                return "Key not found";
             default:
                 return "Unknown access error";
         }
@@ -878,6 +881,11 @@ public:
     template <typename ByteBuffer,typename std::enable_if<ext_traits::is_byte_buffer<ByteBuffer>::value, int>::type = 0>
     access_result<void> get_byte_string(ByteBuffer& buf) const;
 
+    access_result<cbor_item> at(const char* key) const
+    {
+        return at(jsoncons::string_view(key));
+    }
+
     template <typename StringViewLike,typename std::enable_if<ext_traits::is_string_view_like<StringViewLike>::value
         && std::is_same<typename StringViewLike::value_type,char>::value, int>::type = 0>
     access_result<cbor_item> at(StringViewLike key) const
@@ -888,8 +896,25 @@ public:
         {
             return result_type(jsoncons::unexpect, access_errc::invalid_type);
         }
+        bool is_key = true;
+        access_result<jsoncons::string_view> k;
+        for (auto child : children())
+        {
+            if (is_key)
+            {
+                k = child.get_string();
+            }
+            else 
+            {
+                if (k && *k == key)
+                {
+                    return result_type{child};
+                }
+            }
+            is_key = !is_key;
+        }
 
-        return result_type(jsoncons::unexpect, access_errc::indefinite);
+        return result_type(jsoncons::unexpect, access_errc::key_not_found);
     }
 
 private:
