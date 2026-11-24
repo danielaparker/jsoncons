@@ -136,6 +136,37 @@ TEST_CASE("basic_bigdec terminal tests")
     }
 }
 
+TEST_CASE("basic_bigdec missing digits at end of input tests")
+{
+    SECTION("1.[5]")
+    {
+        jsoncons::bigdec value;
+        jsoncons::string_view sv = "1.5";
+
+        auto result = jsoncons::to_bigdec(sv.data(), sv.size()-1, value);
+        CHECK_FALSE(result);
+        CHECK(result.ptr <= sv.data() + sv.size() - 1);
+    }
+    SECTION("1e[5]")
+    {
+        jsoncons::bigdec value;
+        jsoncons::string_view sv = "1e5";
+
+        auto result = jsoncons::to_bigdec(sv.data(), sv.size()-1, value);
+        CHECK_FALSE(result);
+        CHECK(result.ptr <= sv.data() + sv.size() - 1);
+    }
+    SECTION("1.5E[5]")
+    {
+        jsoncons::bigdec value;
+        jsoncons::string_view sv = "1.5E5";
+
+        auto result = jsoncons::to_bigdec(sv.data(), sv.size()-1, value);
+        CHECK_FALSE(result);
+        CHECK(result.ptr <= sv.data() + sv.size() - 1);
+    }
+}
+
 TEST_CASE("basic_bigdec multiply tests")
 {
     SECTION("123456.123456 * 123456789.123456789")
