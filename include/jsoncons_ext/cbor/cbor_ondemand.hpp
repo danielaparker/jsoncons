@@ -62,7 +62,7 @@ public:
             case access_errc::result_out_of_range:
                 return "Result out of range";
             case access_errc::invalid_utf8:
-                return "Invalid utf8";
+                return "Invalid UTF-8";
             default:
                 return "Unknown access error";
         }
@@ -375,7 +375,7 @@ namespace ondemand_detail {
 
         if (head.valid_utf8.load(std::memory_order_relaxed))
         {
-            return result_type{string_view(s, length)};
+            return result_type{jsoncons::in_place, s, length};
         }
 
         if (unicode_traits::validate(s, length).ec != unicode_traits::unicode_errc())
@@ -383,7 +383,7 @@ namespace ondemand_detail {
             return result_type(jsoncons::unexpect, access_errc::invalid_utf8);
         }
         head.valid_utf8.store(true, std::memory_order_relaxed);
-        return result_type{string_view(s, length)};
+        return result_type{jsoncons::in_place, s, length};
     }
 
     inline 
@@ -398,7 +398,7 @@ namespace ondemand_detail {
         {
             return result_type(jsoncons::unexpect, access_errc::indefinite);
         }
-        return result_type{span<const uint8_t>(content, static_cast<std::size_t>(head.value))};
+        return result_type{jsoncons::in_place, content, static_cast<std::size_t>(head.value)};
     }
 
     JSONCONS_FORCE_INLINE bool read_uint(const uint8_t*& p, const uint8_t* end, uint8_t info, uint64_t& value, cbor_errc& ec)
@@ -772,6 +772,9 @@ namespace ondemand_detail {
 // or children(). Borrows the scanned bytes and must not outlive them.
 class cbor_item
 {
+    span<const uint8_t> bytes_;
+    ondemand_detail::item_head head_;
+    const uint8_t* content_;   // first byte after the untagged head
 public:
     // The item's complete encoding, including leading tags.
     span<const uint8_t> encoded_bytes() const noexcept
@@ -886,10 +889,6 @@ private:
     // A string's content: its payload, or its chunks' payloads in order.
     std::size_t content_size() const noexcept;
     void copy_content(uint8_t* out) const noexcept;
-
-    span<const uint8_t> bytes_;
-    ondemand_detail::item_head head_;
-    const uint8_t* content_;   // first byte after the untagged head
 };
 
 namespace ondemand_detail {

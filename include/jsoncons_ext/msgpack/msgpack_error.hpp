@@ -19,7 +19,7 @@ enum class msgpack_errc
     success = 0,
     unexpected_eof = 1,
     source_error,
-    invalid_utf8_text_string,
+    invalid_utf8,
     array_length_required,
     object_length_required,
     too_many_items,
@@ -48,7 +48,7 @@ public:
                 return "Unexpected end of file";
             case msgpack_errc::source_error:
                 return "Source error";
-            case msgpack_errc::invalid_utf8_text_string:
+            case msgpack_errc::invalid_utf8:
                 return "Illegal UTF-8 encoding in text string";
             case msgpack_errc::array_length_required:
                 return "MessagePack encoder requires array length";

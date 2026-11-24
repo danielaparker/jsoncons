@@ -61,7 +61,7 @@ it ends where its parent does.</td>
   </tr>
   <tr>
     <td><code>access_result&lt;jsoncons::string_view> get_string() const noexcept</code></td>
-    <td>Returns an <a href="access_result.md">access_result&lt;jsoncons::string_view&gt;</a>
+    <td>Validates UTF-8 if not already validated. Returns an <a href="access_result.md">access_result&lt;jsoncons::string_view&gt;</a>
     guaranteed to contain valid UTF-8.</td> 
   </tr>
   <tr>
@@ -96,3 +96,132 @@ bool validate_text(const cbor_item&) noexcept;
 indefinite-length text string is checked independently, as RFC 8949 section
 3.2.3 requires.
 
+### Examples
+
+#### Try to access indefinite length byte string
+
+```cpp
+
+```cpp
+#include <jsoncons_ext/cbor/cbor_ondemand.hpp>
+#include <jsoncons/utility/byte_string.hpp>
+#include <iostream>
+#include <vector>
+
+int main()
+{
+    std::vector<uint8_t> data = {
+        0x5F,                   // Start indefinite-length byte string
+        0x42, 0x01, 0x02,       // Chunk 1: 2 bytes
+        0x43, 0x03, 0x04, 0x05, // Chunk 2: 3 bytes
+        0xFF                    // Break
+    };
+
+    auto r = cbor::ondemand::read_item(data);
+    auto r1 = (*r).get_byte_string();
+    if (r1)
+    {
+        std::cout << "(1) ";
+        jsoncons::print_bytes(*r1, std::cout);
+        std::cout << "\n";
+    }
+    else
+    {
+        std::cout << "(1) " << r1.error().message() << "\n";
+    }
+    std::cout << "\n";
+
+    std::vector<uint8_t> buf;
+    auto r2 = (*r).get_byte_string(buf);
+    if (r2)
+    {
+        std::cout << "(2) ";
+        jsoncons::print_bytes(buf, std::cout);
+        std::cout << "\n";
+    }
+    else
+    {
+        std::cout << "(2) " << r2.error().message() << "\n";
+    }
+    return 0;
+}
+```
+Output:
+
+```
+(1) Indefinite length at position 0
+
+(2) 01 02 03 04 05
+```
+
+#### Try to access definite length string containing invalid UTF-8
+
+```cpp
+#include <jsoncons_ext/cbor/cbor_ondemand.hpp>
+#include <iostream>
+#include <vector>
+#include <string>
+
+int main()
+{
+    std::vector<uint8_t> data = {
+        0x63,             // CBOR text string, length 3
+        0x61, 0xFF, 0x62  // 'a', invalid UTF-8 byte, 'b'
+    };
+
+    auto r = cbor::ondemand::read_item(data);
+    std::string buf;
+    auto str = (*r).get_string(buf);
+    if (str)
+    {
+        std::cout << buf << "\n";
+    }
+    else
+    {
+        std::cout << str.error().message() << "\n";
+    }
+    return 0;
+}
+```
+Output:
+
+```
+Invalid UTF-8 at position 0
+```
+
+#### Try to access indefinite length string containing invalid UTF-8
+
+```cpp
+#include <jsoncons_ext/cbor/cbor_ondemand.hpp>
+#include <iostream>
+#include <vector>
+#include <string>
+
+int main()
+{
+    std::vector<uint8_t> data = {
+        0x7F,             // Indefinite-length CBOR text string
+        0x62, 0x61, 0xC3, // Chunk 1: 'a' + first byte of UTF-8 sequence
+        0x62, 0xA9, 0x62, // Chunk 2: second byte of UTF-8 sequence + 'b'
+        0xFF              // Break
+    };
+
+    auto r = cbor::ondemand::read_item(data);
+    std::string buf;
+    auto str = (*r).get_string(buf);
+    if (str)
+    {
+        std::cout << buf << "\n";
+    }
+    else
+    {
+        std::cout << str.error().message() << "\n";
+    }
+    return 0;
+}
+```
+Output:
+
+```
+Invalid UTF-8 at position 0
+```
