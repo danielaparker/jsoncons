@@ -115,12 +115,15 @@ int main()
         0xFF                    // Break
     };
 
-    auto r = cbor::ondemand::read_item(data);
-    auto r1 = (*r).get_byte_string();
-    if (r1)
+    auto item = cbor::ondemand::read_item(data);
+    if (!item)
+    {
+        return 1;
+    }
+    if (auto bstr = (*item).get_byte_string(); bstr)
     {
         std::cout << "(1) ";
-        jsoncons::print_bytes(*r1, std::cout);
+        jsoncons::print_bytes(*bstr, std::cout);
         std::cout << "\n";
     }
     else
@@ -130,8 +133,7 @@ int main()
     std::cout << "\n";
 
     std::vector<uint8_t> buf;
-    auto r2 = (*r).get_byte_string(buf);
-    if (r2)
+    if (auto bstr = (*item).get_byte_string(buf); bstr)
     {
         std::cout << "(2) ";
         jsoncons::print_bytes(buf, std::cout);
@@ -139,7 +141,7 @@ int main()
     }
     else
     {
-        std::cout << "(2) " << r2.error().message() << "\n";
+        std::cout << "(2) " << bstr.error().message() << "\n";
     }
     return 0;
 }
@@ -167,10 +169,13 @@ int main()
         0x61, 0xFF, 0x62  // 'a', invalid UTF-8 byte, 'b'
     };
 
-    auto r = cbor::ondemand::read_item(data);
+    auto item = cbor::ondemand::read_item(data);
+    if (!item)
+    {
+        return 1;
+    }
     std::string buf;
-    auto str = (*r).get_string(buf);
-    if (str)
+    if (auto str = (*item).get_string(buf); str)
     {
         std::cout << buf << "\n";
     }
@@ -204,10 +209,13 @@ int main()
         0xFF              // Break
     };
 
-    auto r = cbor::ondemand::read_item(data);
+    auto item = cbor::ondemand::read_item(data);
+    if (!item)
+    {
+        return 1;
+    }
     std::string buf;
-    auto str = (*r).get_string(buf);
-    if (str)
+    if (auto str = (*item).get_string(buf); str)
     {
         std::cout << buf << "\n";
     }
@@ -224,16 +232,9 @@ Output:
 Invalid UTF-8 at position 0
 ```
 
-#### Try to access indefinite length string containing invalid UTF-8
+#### Access mapped value by key
 
 ```cpp
-#include <jsoncons_ext/cbor/cbor_ondemand.hpp>
-#include <iostream>
-#include <vector>
-#include <string>
-
-int main()
-{
     const std::vector<uint8_t> data = {
 0xA3,                         // Map with 3 key-value pairs
 0x63, 0x66, 0x6F, 0x6F,       // Key: "foo"
@@ -244,32 +245,32 @@ int main()
 0x03                          // Value: 3
     };
 
-    auto result = cbor::ondemand::read_item(data);   
-    if (!result)
+    auto item = cbor::ondemand::read_item(data);   
+    if (!item)
     {
-        return -1;
+        return 1;
     }
-    if (auto item = (*result).at("bar"); item)
+    if (auto bar = (*item).at("bar"); bar)
     {
-        if (auto val = (*item).get_uint64(); val)
+        if (auto val = (*bar).get_uint64(); val)
         {
             std::cout << "(1) " << *val << "\n";
         }
     }
     else
     {
-        std::cout << "(1) " << item.error().message() << "\n";
+        std::cout << "(1) " << bar.error().message() << "\n";
     }
-    if (auto item = (*result).at("qux"); item)
+    if (auto qux = (*item).at("qux"); qux)
     {
-        if (auto val = (*item).get_uint64(); val)
+        if (auto val = (*qux).get_uint64(); val)
         {
             std::cout << "(2) " << *val << "\n";
         }
     }
     else
     {
-        std::cout << "(2) " << item.error().message() << "\n";
+        std::cout << "(2) " << qux.error().message() << "\n";
     }
     return 0;
 }

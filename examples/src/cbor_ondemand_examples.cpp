@@ -27,7 +27,7 @@ int cbor_ondemand_example()
 
     bool is_key = true;
     std::string_view key;
-    for (const cbor::ondemand::cbor_item child : item.value().children())
+    for (const auto child : item.value().children())
     {
         if (is_key)
         {
@@ -36,7 +36,7 @@ int cbor_ondemand_example()
         else if (child.type() == cbor::ondemand::cbor_type::array)
         {
             std::cout << key << ":";
-            for (const cbor::ondemand::cbor_item element : child.children())
+            for (const auto element : child.children())
             {
                 uint64_t value = element.get_uint64().value();
                 std::cout << " " << value;
@@ -62,12 +62,15 @@ int indefinite_length_byte_string()
         0xFF                    // Break
     };
 
-    auto r = cbor::ondemand::read_item(data);
-    auto r1 = (*r).get_byte_string();
-    if (r1)
+    auto item = cbor::ondemand::read_item(data);
+    if (!item)
+    {
+        return 1;
+    }
+    if (auto bstr = (*item).get_byte_string(); bstr)
     {
         std::cout << "(1) ";
-        jsoncons::print_bytes(*r1, std::cout);
+        jsoncons::print_bytes(*bstr, std::cout);
         std::cout << "\n";
     }
     else
@@ -77,8 +80,7 @@ int indefinite_length_byte_string()
     std::cout << "\n";
 
     std::vector<uint8_t> buf;
-    auto r2 = (*r).get_byte_string(buf);
-    if (r2)
+    if (auto bstr = (*item).get_byte_string(buf); bstr)
     {
         std::cout << "(2) ";
         jsoncons::print_bytes(buf, std::cout);
@@ -86,7 +88,7 @@ int indefinite_length_byte_string()
     }
     else
     {
-        std::cout << "(2) " << r2.error().message() << "\n";
+        std::cout << "(2) " << bstr.error().message() << "\n";
     }
     return 0;
 }
@@ -98,10 +100,13 @@ int definite_length_string_invalid_utf8()
         0x61, 0xFF, 0x62  // 'a', invalid UTF-8 byte, 'b'
     };
 
-    auto r = cbor::ondemand::read_item(data);
+    auto item = cbor::ondemand::read_item(data);
+    if (!item)
+    {
+        return 1;
+    }
     std::string buf;
-    auto str = (*r).get_string(buf);
-    if (str)
+    if (auto str = (*item).get_string(buf); str)
     {
         std::cout << buf << "\n";
     }
@@ -121,10 +126,13 @@ int indefinite_length_string_invalid_utf8()
         0xFF              // Break
     };
 
-    auto r = cbor::ondemand::read_item(data);
+    auto item = cbor::ondemand::read_item(data);
+    if (!item)
+    {
+        return 1;
+    }
     std::string buf;
-    auto str = (*r).get_string(buf);
-    if (str)
+    if (auto str = (*item).get_string(buf); str)
     {
         std::cout << buf << "\n";
     }
@@ -147,32 +155,32 @@ int at_example()
 0x03                          // Value: 3
     };
 
-    auto result = cbor::ondemand::read_item(data);   
-    if (!result)
+    auto item = cbor::ondemand::read_item(data);   
+    if (!item)
     {
-        return -1;
+        return 1;
     }
-    if (auto item = (*result).at("bar"); item)
+    if (auto bar = (*item).at("bar"); bar)
     {
-        if (auto val = (*item).get_uint64(); val)
+        if (auto val = (*bar).get_uint64(); val)
         {
             std::cout << "(1) " << *val << "\n";
         }
     }
     else
     {
-        std::cout << "(1) " << item.error().message() << "\n";
+        std::cout << "(1) " << bar.error().message() << "\n";
     }
-    if (auto item = (*result).at("qux"); item)
+    if (auto qux = (*item).at("qux"); qux)
     {
-        if (auto val = (*item).get_uint64(); val)
+        if (auto val = (*qux).get_uint64(); val)
         {
             std::cout << "(2) " << *val << "\n";
         }
     }
     else
     {
-        std::cout << "(2) " << item.error().message() << "\n";
+        std::cout << "(2) " << qux.error().message() << "\n";
     }
     return 0;
 }
