@@ -1,4 +1,4 @@
-### jsoncons::jsonschema::read_item, jsoncons::jsonschema::read_item_sequence
+### jsoncons::cbor::ondemand::read_item, jsoncons::cbor::ondemand::read_item_sequence
 
 ```cpp
 #include <jsoncons_ext/cbor/cbor_ondemand.hpp>
@@ -12,7 +12,9 @@ expected<cbor_sequence, read_error> read_sequence(
     int max_nesting_depth = default_max_nesting_depth);
 ```
 
-**Helper types**
+(1) If successful, returns an [cbor_item](cbor_item.md), otherwise a [read_error](read_error.md).
+
+(2) If successful, returns a `cbor_sequence` defined as
 
 ```cpp
 struct cbor_sequence
@@ -21,10 +23,7 @@ struct cbor_sequence
     span<const uint8_t> tail;
 };
 ```
-
-(1) Returns an [cbor_item](cbor_item.md) or a [read_error](read_error.md).
-
-(2) Returns a `cbor_sequence` or a [read_error](read_error.md).
+, otherwise a [read_error](read_error.md).
 
 `read_sequence` checks the first item in `input` and returns it with the bytes that
 follow, so a CBOR sequence can be read by reading the remaining bytes repeatedly.
