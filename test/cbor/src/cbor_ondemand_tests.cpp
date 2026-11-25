@@ -1052,7 +1052,7 @@ TEST_CASE("cbor ondemand get_bigfloat tests")
 
 TEST_CASE("cbor ondemand get_bignum tests")
 {
-    SECTION("positive big")
+    SECTION("positive bignum")
     {
         const std::vector<uint8_t> data = {
     0xC2, // Tag 2: positive bignum
@@ -1094,6 +1094,29 @@ TEST_CASE("cbor ondemand get_bignum tests")
         CHECK((*big).first);
         auto bytes = (*big).second;
         CHECK(std::equal(data.begin() + 2, data.end(),
+            bytes.begin(),bytes.end()));
+    }
+    SECTION("positive bignum, two tags")
+    {
+        const std::vector<uint8_t> data = {
+    0xD8, 0x64,  // Tag 100 (outer tag)
+    0xC2,        // Tag 2 (positive bignum)
+    0x49,        // Byte string, length 9
+    0x01, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00
+        };
+
+        auto item = cbor::ondemand::read_item(data);
+        REQUIRE(item);
+        auto big = (*item).get_bignum();
+        if (!big)
+        {
+            std::cout << big.error().message() << "\n";
+        }
+        REQUIRE(big);
+        CHECK_FALSE((*big).first);
+        auto bytes = (*big).second;
+        CHECK(std::equal(data.begin() + 4, data.end(),
             bytes.begin(),bytes.end()));
     }
 }
