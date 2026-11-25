@@ -85,16 +85,28 @@ indefinite-length strings into the provided buffer.</td>
 indefinite-length strings into the provided buffer.</td> 
   </tr>
   <tr>
-    <td><code>template &lt;typename StringViewLike&gt;<br/>access_result&lt;cbor_view> at(StringViewLike key) const</code></td>
+    <td><code>template &lt;typename StringViewLike&gt;<br/>access_result&lt;cbor_view> at(StringViewLike key) const noexcept</code></td>
     <td>Returns item if found, otherwise error.</td> 
   </tr>
   <tr>
-    <td>access_result&lt;cbor_view> at(const char* key) const</code></td>
+    <td><code>access_result&lt;cbor_view> at(const char* key) const noexcept</code></td>
     <td>Returns item if found, otherwise error.</td> 
   </tr>
   <tr>
-    <td><code>template &lt;typename UnsignedInteger&gt;<br/>access_result&lt;cbor_view> at(UnsignedInteger key) const</code></td>
+    <td><code>template &lt;typename UnsignedInteger&gt;<br/>access_result&lt;cbor_view> at(UnsignedInteger key) const noexcept</code></td>
     <td>Returns mapped item from map or indexed item from array if found, otherwise error.</td> 
+  </tr>
+  <tr>
+    <td><code>    access_result<std::pair<bool,jsoncons::span<const uint8_t>>> get_bignum() const noexcept;</code></td>
+    <td>Returns a bignum if found.</td> 
+  </tr>
+  <tr>
+    <td><code>access_result<std::pair<int64_t,cbor_item>> get_bigdecimal() const noexcept</code></td>
+    <td>Returns a bigdecimal if found.</td> 
+  </tr>
+  <tr>
+    <td><code>access_result<std::pair<int64_t,cbor_item>> get_bigfloat() const noexcept</code></td>
+    <td>Returns a bigfloat if found.</td> 
   </tr>
 </table>
 

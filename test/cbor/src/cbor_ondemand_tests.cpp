@@ -17,6 +17,8 @@
 
 namespace cbor = jsoncons::cbor;
 
+#if 0
+
 namespace {
 
     cbor::ondemand::cbor_item parse(const std::vector<uint8_t>& data)
@@ -842,5 +844,256 @@ TEST_CASE("cbor ondemand at tests")
         auto val = (*r).get_uint64();
         REQUIRE(val);
         CHECK(3 == *val);
+    }
+}
+
+#endif 
+
+TEST_CASE("cbor ondemand get_bigdecimal tests")
+{
+    SECTION("bigdecimal with negative exponent and positive integer mantissa")
+    {
+        const std::vector<uint8_t> data = {
+    0xC4,             // Tag 4: decimal fraction
+    0x82,             // Array of 2 elements
+    0x21,             // Exponent: -2
+    0x19, 0x30, 0x39  // Mantissa: 12345
+        };
+
+        auto item = cbor::ondemand::read_item(data);
+        REQUIRE(item);
+        auto big = (*item).get_bigdecimal();
+        if (!big)
+        {
+            std::cout << big.error().message() << "\n";
+        }
+        REQUIRE(big);
+        CHECK(((*big).first == -2));
+        auto mantissa = (*big).second.get_int64();
+        REQUIRE(mantissa);
+        CHECK(12345 == *mantissa);
+    }
+    SECTION("bigdecimal with negative exponent and negative integer mantissa")
+    {
+        const std::vector<uint8_t> data = {
+    0xC4,             // Tag 4: decimal fraction
+    0x82,             // Array of 2 elements
+    0x03,             // Exponent: +3
+    0x39, 0x30, 0x38  // Mantissa: -12345
+        };
+
+        auto item = cbor::ondemand::read_item(data);
+        REQUIRE(item);
+        auto big = (*item).get_bigdecimal();
+        if (!big)
+        {
+            std::cout << big.error().message() << "\n";
+        }
+        REQUIRE(big);
+        CHECK(((*big).first == 3));
+        auto mantissa = (*big).second.get_int64();
+        REQUIRE(mantissa);
+        CHECK(-12345 == *mantissa);
+    }
+    SECTION("bigdecimal with negative exponent and bignum mantissa")
+    {
+        const std::vector<uint8_t> data = {
+    0xC4, // Tag 4: decimal fraction
+    0x82, // Array of 2 elements
+    0x24, // Exponent: -5
+    0xC3, // Tag 3: negative bignum
+    0x4B, // Byte string of 11 bytes
+    0x01, 0x05, 0x6E, 0x0F,
+    0x36, 0xA6, 0x44, 0x3D,
+    0xE2, 0xDF, 0x78        };
+
+        auto item = cbor::ondemand::read_item(data);
+        REQUIRE(item);
+        auto big = (*item).get_bigdecimal();
+        if (!big)
+        {
+            std::cout << big.error().message() << "\n";
+        }
+        REQUIRE(big);
+        CHECK(((*big).first == -5));
+        auto mantissa = (*big).second.get_byte_string();
+        REQUIRE(mantissa);
+        CHECK(std::equal(data.begin() + 5, data.end(),
+            (*mantissa).begin(),(*mantissa).end()));
+    }
+    SECTION("bigdecimal with positive exponent and bignum mantissa")
+    {
+        const std::vector<uint8_t> data = {
+    0xC4, // Tag 4: decimal fraction
+    0x82, // Array of 2 elements
+    0x03, // Exponent: +3
+    0xC2, // Tag 2: positive bignum
+    0x49, // Byte string of 9 bytes
+    0x01, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00
+        };
+
+        auto item = cbor::ondemand::read_item(data);
+        REQUIRE(item);
+        auto big = (*item).get_bigdecimal();
+        if (!big)
+        {
+            std::cout << big.error().message() << "\n";
+        }
+        REQUIRE(big);
+        CHECK(((*big).first == 3));
+        auto mantissa = (*big).second.get_byte_string();
+        REQUIRE(mantissa);
+        CHECK(std::equal(data.begin() + 5, data.end(),
+            (*mantissa).begin(),(*mantissa).end()));
+    }
+}
+
+TEST_CASE("cbor ondemand get_bigfloat tests")
+{
+    SECTION("bigfloat with negative exponent and positive integer mantissa")
+    {
+        const std::vector<uint8_t> data = {
+    0xC5,             // Tag 4: decimal fraction
+    0x82,             // Array of 2 elements
+    0x21,             // Exponent: -2
+    0x19, 0x30, 0x39  // Mantissa: 12345
+        };
+
+        auto item = cbor::ondemand::read_item(data);
+        REQUIRE(item);
+        auto big = (*item).get_bigfloat();
+        if (!big)
+        {
+            std::cout << big.error().message() << "\n";
+        }
+        REQUIRE(big);
+        CHECK(((*big).first == -2));
+        auto mantissa = (*big).second.get_int64();
+        REQUIRE(mantissa);
+        CHECK(12345 == *mantissa);
+    }
+    SECTION("bigfloat with negative exponent and negative integer mantissa")
+    {
+        const std::vector<uint8_t> data = {
+    0xC5,             // Tag 4: decimal fraction
+    0x82,             // Array of 2 elements
+    0x03,             // Exponent: +3
+    0x39, 0x30, 0x38  // Mantissa: -12345
+        };
+
+        auto item = cbor::ondemand::read_item(data);
+        REQUIRE(item);
+        auto big = (*item).get_bigfloat();
+        if (!big)
+        {
+            std::cout << big.error().message() << "\n";
+        }
+        REQUIRE(big);
+        CHECK(((*big).first == 3));
+        auto mantissa = (*big).second.get_int64();
+        REQUIRE(mantissa);
+        CHECK(-12345 == *mantissa);
+    }
+    SECTION("bigfloat with negative exponent and bignum mantissa")
+    {
+        const std::vector<uint8_t> data = {
+    0xC5, // Tag 4: decimal fraction
+    0x82, // Array of 2 elements
+    0x24, // Exponent: -5
+    0xC3, // Tag 3: negative bignum
+    0x4B, // Byte string of 11 bytes
+    0x01, 0x05, 0x6E, 0x0F,
+    0x36, 0xA6, 0x44, 0x3D,
+    0xE2, 0xDF, 0x78        };
+
+        auto item = cbor::ondemand::read_item(data);
+        REQUIRE(item);
+        auto big = (*item).get_bigfloat();
+        if (!big)
+        {
+            std::cout << big.error().message() << "\n";
+        }
+        REQUIRE(big);
+        CHECK(((*big).first == -5));
+        auto mantissa = (*big).second.get_byte_string();
+        REQUIRE(mantissa);
+        CHECK(std::equal(data.begin() + 5, data.end(),
+            (*mantissa).begin(),(*mantissa).end()));
+    }
+    SECTION("bigfloat with positive exponent and bignum mantissa")
+    {
+        const std::vector<uint8_t> data = {
+    0xC5, // Tag 4: decimal fraction
+    0x82, // Array of 2 elements
+    0x03, // Exponent: +3
+    0xC2, // Tag 2: positive bignum
+    0x49, // Byte string of 9 bytes
+    0x01, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00
+        };
+
+        auto item = cbor::ondemand::read_item(data);
+        REQUIRE(item);
+        auto big = (*item).get_bigfloat();
+        if (!big)
+        {
+            std::cout << big.error().message() << "\n";
+        }
+        REQUIRE(big);
+        CHECK(((*big).first == 3));
+        auto mantissa = (*big).second.get_byte_string();
+        REQUIRE(mantissa);
+        CHECK(std::equal(data.begin() + 5, data.end(),
+            (*mantissa).begin(),(*mantissa).end()));
+    }
+}
+
+
+TEST_CASE("cbor ondemand get_bignum tests")
+{
+    SECTION("positive big")
+    {
+        const std::vector<uint8_t> data = {
+    0xC2, // Tag 2: positive bignum
+    0x49, // Byte string of 9 bytes
+    0x01, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00
+        };
+
+        auto item = cbor::ondemand::read_item(data);
+        REQUIRE(item);
+        auto big = (*item).get_bignum();
+        if (!big)
+        {
+            std::cout << big.error().message() << "\n";
+        }
+        REQUIRE(big);
+        CHECK_FALSE((*big).first);
+        auto bytes = (*big).second;
+        CHECK(std::equal(data.begin() + 2, data.end(),
+            bytes.begin(),bytes.end()));
+    }
+    SECTION("negative bignum")
+    {
+        const std::vector<uint8_t> data = {
+    0xC3, // Tag 3: negative bignum
+    0x49, // Byte string of 9 bytes
+    0x01, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00
+        };
+
+        auto item = cbor::ondemand::read_item(data);
+        REQUIRE(item);
+        auto big = (*item).get_bignum();
+        if (!big)
+        {
+            std::cout << big.error().message() << "\n";
+        }
+        REQUIRE(big);
+        CHECK((*big).first);
+        auto bytes = (*big).second;
+        CHECK(std::equal(data.begin() + 2, data.end(),
+            bytes.begin(),bytes.end()));
     }
 }

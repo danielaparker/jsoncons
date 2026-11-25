@@ -881,21 +881,29 @@ public:
     template <typename ByteBuffer,typename std::enable_if<ext_traits::is_byte_buffer<ByteBuffer>::value, int>::type = 0>
     access_result<void> get_byte_string(ByteBuffer& buf) const;
 
-    access_result<cbor_item> at(const char* key) const
+    access_result<cbor_item> at(const char* key) const noexcept
     {
         return at(jsoncons::string_view(key));
     }
 
     template <typename StringViewLike,typename std::enable_if<ext_traits::is_string_view_like<StringViewLike>::value
         && std::is_same<typename StringViewLike::value_type,char>::value, int>::type = 0>
-    access_result<cbor_item> at(StringViewLike key) const;
+    access_result<cbor_item> at(StringViewLike key) const noexcept;
 
     template <typename UnsignedInteger,typename std::enable_if<ext_traits::is_unsigned_integer<UnsignedInteger>::value, 
         int>::type = 0>
-    access_result<cbor_item> at(UnsignedInteger key) const;
+    access_result<cbor_item> at(UnsignedInteger key) const noexcept;
+
+    access_result<std::pair<std::int64_t,cbor_item>> get_bigdecimal() const noexcept;
+
+    access_result<std::pair<std::int64_t,cbor_item>> get_bigfloat() const noexcept;
+
+    access_result<std::pair<bool,jsoncons::span<const uint8_t>>> get_bignum() const noexcept;
 
 private:
     friend struct ondemand_detail::item_access;
+
+    cbor_item() noexcept = default;
 
     cbor_item(span<const uint8_t> bytes, const ondemand_detail::item_head& head, const uint8_t* content) noexcept
         : bytes_(bytes), head_(head), content_(content)
@@ -1419,7 +1427,7 @@ access_result<void> cbor_item::get_byte_string(ByteBuffer& buf) const
 
 template <typename StringViewLike,typename std::enable_if<ext_traits::is_string_view_like<StringViewLike>::value
     && std::is_same<typename StringViewLike::value_type,char>::value, int>::type>
-access_result<cbor_item> cbor_item::at(StringViewLike key) const
+access_result<cbor_item> cbor_item::at(StringViewLike key) const noexcept
 {
     using result_type = access_result<cbor_item>;
 
@@ -1450,7 +1458,7 @@ access_result<cbor_item> cbor_item::at(StringViewLike key) const
 
 template <typename UnsignedInteger,typename std::enable_if<ext_traits::is_unsigned_integer<UnsignedInteger>::value, 
     int>::type>
-access_result<cbor_item> cbor_item::at(UnsignedInteger key) const
+access_result<cbor_item> cbor_item::at(UnsignedInteger key) const noexcept
 {
     using result_type = access_result<cbor_item>;
 
@@ -1493,6 +1501,145 @@ access_result<cbor_item> cbor_item::at(UnsignedInteger key) const
     {
         return result_type(jsoncons::unexpect, access_errc::invalid_type);
     }
+}
+
+access_result<std::pair<int64_t,cbor_item>> cbor_item::get_bigdecimal() const noexcept
+{
+    using value_type = std::pair<int64_t, cbor_item>;
+    using result_type = access_result<value_type>;
+    if (!(head_.major_type == cbor::cbor_major_type::array && head_.value == 2))
+    {
+        return result_type(jsoncons::unexpect, access_errc::invalid_type);
+    }
+    uint64_t tag{};
+    for (auto t : tags())
+    {
+        tag = t;
+    }
+    if (tag != 4)
+    {
+        return result_type(jsoncons::unexpect, access_errc::invalid_type);
+    }
+
+    std::int64_t exponent{};
+    cbor_item mantissa{};
+
+    std::size_t index = 0;
+    for (auto child : children())
+    {
+        if (index == 0)
+        {
+            auto r = child.get_int64();
+            if (!r)
+            {
+                return result_type(jsoncons::unexpect, r.error());
+            }
+            exponent = *r;
+        }
+        if (index == 1)
+        {
+            if (child.type() == cbor_type::byte_string)
+            {
+                tag = 0;
+                for (auto t : child.tags())
+                {
+                    tag = t;
+                }
+                if (!(tag == 2 || tag == 3))
+                {
+                    return result_type(jsoncons::unexpect, access_errc::invalid_type);
+                }
+            }
+            else if (!(child.type() == cbor_type::unsigned_integer || child.type() == cbor_type::negative_integer))
+            {
+                return result_type(jsoncons::unexpect, access_errc::invalid_type);
+            }
+            mantissa = child;
+        }
+        ++index;
+    }
+
+    return result_type{std::pair<int64_t,cbor_item>{exponent, mantissa}};
+}
+
+access_result<std::pair<int64_t,cbor_item>> cbor_item::get_bigfloat() const noexcept
+{
+    using value_type = std::pair<int64_t, cbor_item>;
+    using result_type = access_result<value_type>;
+    if (!(head_.major_type == cbor::cbor_major_type::array && head_.value == 2))
+    {
+        return result_type(jsoncons::unexpect, access_errc::invalid_type);
+    }
+    uint64_t tag{};
+    for (auto t : tags())
+    {
+        tag = t;
+    }
+    if (tag != 5)
+    {
+        return result_type(jsoncons::unexpect, access_errc::invalid_type);
+    }
+
+    std::int64_t exponent{};
+    cbor_item mantissa{};
+
+    std::size_t index = 0;
+    for (auto child : children())
+    {
+        if (index == 0)
+        {
+            auto r = child.get_int64();
+            if (!r)
+            {
+                return result_type(jsoncons::unexpect, r.error());
+            }
+            exponent = *r;
+        }
+        if (index == 1)
+        {
+            if (child.type() == cbor_type::byte_string)
+            {
+                tag = 0;
+                for (auto t : child.tags())
+                {
+                    tag = t;
+                }
+                if (!(tag == 2 || tag == 3))
+                {
+                    return result_type(jsoncons::unexpect, access_errc::invalid_type);
+                }
+            }
+            else if (!(child.type() == cbor_type::unsigned_integer || child.type() == cbor_type::negative_integer))
+            {
+                return result_type(jsoncons::unexpect, access_errc::invalid_type);
+            }
+            mantissa = child;
+        }
+        ++index;
+    }
+
+    return result_type{std::pair<int64_t,cbor_item>{exponent, mantissa}};
+}
+
+access_result<std::pair<bool,jsoncons::span<const uint8_t>>> cbor_item::get_bignum() const noexcept
+{
+    using value_type = std::pair<bool,jsoncons::span<const uint8_t>>;
+    using result_type = access_result<value_type>;
+
+    uint64_t tag{};
+    for (auto t : tags())
+    {
+        tag = t;
+    }
+    if (!(tag == 2 || tag == 3))
+    {
+        return result_type(jsoncons::unexpect, access_errc::invalid_type);
+    }
+    if (major_type() != cbor_major_type::byte_string)
+    {
+        return result_type(jsoncons::unexpect, access_errc::invalid_type);
+    }
+    return result_type{value_type{(tag == 3), jsoncons::span<const uint8_t>{content_, head_.value}}};
 }
 
 } // namespace ondemand
