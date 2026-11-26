@@ -67,6 +67,10 @@ master
 
   - Git Issue PR #826: jmespath: evaluate a parenthesized expression with a pipe as one operand
 
+  - Git Issue PR #827: fix out-of-bounds write on empty subfield in csv m_columns mode
+
+  - Git Issue PR #828: jsonschema: stop truncating instance strings at an embedded NUL
+
 - Changes:
 
   - Until 1.11.0, the CBOR parser converted bigfloats to a hexadecimal 
