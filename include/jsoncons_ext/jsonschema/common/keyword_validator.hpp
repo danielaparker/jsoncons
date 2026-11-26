@@ -640,10 +640,11 @@ namespace jsonschema {
 
             eval_context<Json> this_context(context, this->keyword());
 
-            if (!std::regex_search(instance.as_cstring(), regex_))
+            auto sv = instance.as_string_view();
+            if (!std::regex_search(sv.begin(), sv.end(), regex_))
             {
                 std::string message("String '");
-                message.append(instance.as_cstring());
+                message.append(sv.data(), sv.size());
                 message.append("' does not match pattern '");
                 message.append(pattern_string_);
                 message.append("'.");
@@ -2590,7 +2591,7 @@ namespace jsonschema {
 
             for (const auto& prop : instance.object_range()) 
             {
-                auto prop_it = properties_.find(prop.key().c_str());
+                auto prop_it = properties_.find(prop.name());
 
                 // check if it is in "properties"
                 if (prop_it != properties_.end()) 
@@ -2662,7 +2663,7 @@ namespace jsonschema {
 
             for (const auto& prop : instance.object_range()) 
             {
-                auto prop_it = properties_.find(prop.key().c_str());
+                auto prop_it = properties_.find(prop.name());
 
                 if (prop_it != properties_.end()) 
                 {
@@ -2906,7 +2907,7 @@ namespace jsonschema {
                         eval_context<Json> prop_context{this_context, prop.name(), evaluation_flags{}};
                         jsonpointer::json_pointer prop_location = instance_location / prop.key();
                         // check if it is in "allowed properties"
-                        auto prop_it = allowed_properties.find(prop.key().c_str());
+                        auto prop_it = allowed_properties.find(std::string(prop.name()));
                         if (prop_it == allowed_properties.end()) 
                         {
                             std::string message{"Additional property '"};
@@ -2938,7 +2939,7 @@ namespace jsonschema {
                     for (const auto& prop : instance.object_range()) 
                     {
                         // check if it is in "allowed properties"
-                        auto prop_it = allowed_properties.find(prop.key().c_str());
+                        auto prop_it = allowed_properties.find(std::string(prop.name()));
                         if (prop_it == allowed_properties.end()) 
                         {
                             eval_context<Json> prop_context{this_context, prop.name(), evaluation_flags{}};
@@ -3022,7 +3023,7 @@ namespace jsonschema {
                 for (const auto& prop : instance.object_range()) 
                 {
                     // check if it is in "allowed properties"
-                    auto prop_it = allowed_properties.find(prop.key().c_str());
+                    auto prop_it = allowed_properties.find(std::string(prop.name()));
                     if (prop_it == allowed_properties.end()) 
                     {
                         eval_context<Json> prop_context{this_context, prop.name(), evaluation_flags{}};
@@ -3927,7 +3928,7 @@ namespace jsonschema {
                     for (const auto& prop : instance.object_range()) 
                     {
                         // check if it is in "evaluated_properties"
-                        auto prop_it = results.evaluated_properties.find(prop.key().c_str());
+                        auto prop_it = results.evaluated_properties.find(std::string(prop.name()));
                         if (prop_it == results.evaluated_properties.end()) 
                         {
                             eval_context<Json> prop_context{this_context, prop.name(), evaluation_flags{}};
@@ -3963,7 +3964,7 @@ namespace jsonschema {
                     for (const auto& prop : instance.object_range()) 
                     {
                         // check if it is in "evaluated_properties"
-                        auto prop_it = results.evaluated_properties.find(prop.key().c_str());
+                        auto prop_it = results.evaluated_properties.find(std::string(prop.name()));
                         if (prop_it == results.evaluated_properties.end()) 
                         {
                             //std::cout << "Not in evaluated properties: " << prop.key() << "\n";
