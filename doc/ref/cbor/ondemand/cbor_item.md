@@ -31,7 +31,7 @@ or a simple value's number (the bit pattern of a float).</td>
     <td>Returns true if a byte string or text string has indefinite length, otherwise false.</td> 
   </tr>
   <tr>
-    <td><code>tag_range tags() const noexcept</code></td>
+    <td><code>tag_view tags() const noexcept</code></td>
     <td>Returns the the leading tag numbers, outermost first.</td> 
   </tr>
   <tr>

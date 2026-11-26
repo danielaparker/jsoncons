@@ -17,8 +17,6 @@
 
 namespace cbor = jsoncons::cbor;
 
-#if 0
-
 namespace {
 
     cbor::ondemand::cbor_item parse(const std::vector<uint8_t>& data)
@@ -847,8 +845,6 @@ TEST_CASE("cbor ondemand at tests")
     }
 }
 
-#endif 
-
 TEST_CASE("cbor ondemand get_bigdecimal tests")
 {
     SECTION("bigdecimal with negative exponent and positive integer mantissa")
@@ -1048,7 +1044,6 @@ TEST_CASE("cbor ondemand get_bigfloat tests")
             (*mantissa).begin(),(*mantissa).end()));
     }
 }
-
 
 TEST_CASE("cbor ondemand get_bignum tests")
 {

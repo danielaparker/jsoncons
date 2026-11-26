@@ -197,6 +197,42 @@ public:
     }
 };
 
+inline
+bool read_uint(const uint8_t*& p, const uint8_t* end, uint8_t info, uint64_t& value, cbor_errc& ec)
+{
+    if (info < 24)
+    {
+        value = info;
+        return true;
+    }
+
+    std::size_t length = 0;
+    switch (info)
+    {
+        case 24: length = 1; break;
+        case 25: length = 2; break;
+        case 26: length = 4; break;
+        case 27: length = 8; break;
+        default:
+            ec = cbor_errc::reserved_additional_info;
+            return false;
+    }
+
+    if (static_cast<std::size_t>(end - p) < length)
+    {
+        ec = cbor_errc::unexpected_eof;
+        return false;
+    }
+
+    value = 0;
+    for (std::size_t i = 0; i < length; ++i)
+    {
+        value = (value << 8) | static_cast<uint64_t>(p[i]);
+    }
+    p += length;
+    return true;
+}
+
 namespace ondemand_detail {
 
     struct item_head
@@ -402,41 +438,6 @@ namespace ondemand_detail {
             return result_type(jsoncons::unexpect, access_errc::indefinite);
         }
         return result_type{jsoncons::in_place, content, static_cast<std::size_t>(head.value)};
-    }
-
-    JSONCONS_FORCE_INLINE bool read_uint(const uint8_t*& p, const uint8_t* end, uint8_t info, uint64_t& value, cbor_errc& ec)
-    {
-        if (info < 24)
-        {
-            value = info;
-            return true;
-        }
-
-        std::size_t length = 0;
-        switch (info)
-        {
-            case 24: length = 1; break;
-            case 25: length = 2; break;
-            case 26: length = 4; break;
-            case 27: length = 8; break;
-            default:
-                ec = cbor_errc::reserved_additional_info;
-                return false;
-        }
-
-        if (static_cast<std::size_t>(end - p) < length)
-        {
-            ec = cbor_errc::unexpected_eof;
-            return false;
-        }
-
-        value = 0;
-        for (std::size_t i = 0; i < length; ++i)
-        {
-            value = (value << 8) | static_cast<uint64_t>(p[i]);
-        }
-        p += length;
-        return true;
     }
 
     JSONCONS_FORCE_INLINE bool read_head(const uint8_t*& p, const uint8_t* end, item_head& head, cbor_errc& ec)
@@ -814,12 +815,13 @@ public:
     }
 
     class tag_iterator;
-    class tag_range;
+    class reverse_tag_iterator;
+    class tag_view;
     class child_iterator;
     class child_range;
 
     // The item's leading tag numbers, outermost first.
-    tag_range tags() const noexcept;
+    tag_view tags() const noexcept;
 
     // The data items this item is made of: an array's elements, a map's
     // keys and values alternating, or the definite-length chunks of an
@@ -973,7 +975,7 @@ public:
     }
 
 private:
-    friend class tag_range;
+    friend class tag_view;
 
     tag_iterator(const uint8_t* pos, const uint8_t* stop) noexcept
         : pos_(pos), stop_(stop), value_(0)
@@ -991,6 +993,7 @@ private:
         ondemand_detail::item_head head;
         cbor_errc ec{};
         const uint8_t* p = pos_;
+
         const bool ok = ondemand_detail::read_head(p, stop_, head, ec);
         assert(ok && head.major_type == cbor::cbor_major_type::semantic_tag);
         (void)ok;
@@ -999,27 +1002,112 @@ private:
     }
 };
 
-class cbor_item::tag_range
+class cbor_item::reverse_tag_iterator
+{
+    const uint8_t* begin_ = nullptr;
+    const uint8_t* current_ = nullptr;
+    std::uint64_t value_{0};
+
+    static std::size_t tag_size(uint8_t b) noexcept
+    {
+        unsigned ai = b & 0x1F;
+        return ai < 24 ? 1 : 1 + (1u << (ai - 24));
+    }
+
+    static const uint8_t* previous(const uint8_t* begin, const uint8_t* end) noexcept
+    {
+        const uint8_t* last = nullptr;
+
+        for (auto p = begin; p != end; p += tag_size(*p))
+            last = p;
+
+        return last;
+    }
+
+    static uint64_t tag_value(const uint8_t* last, const uint8_t* end) noexcept
+    {
+        if (last == nullptr || last == end)
+        {
+            return 0;
+        }
+
+        ondemand_detail::item_head head;
+        cbor_errc ec{};
+        const bool ok = ondemand_detail::read_head(last, end, head, ec);
+        assert(ok && head.major_type == cbor::cbor_major_type::semantic_tag);
+        (void)ok;
+        return head.value;
+    }
+
+public:
+    using iterator_category = std::input_iterator_tag;
+    using value_type = uint64_t;
+    using difference_type = std::ptrdiff_t;
+    using pointer = void;
+    using reference = uint64_t;
+
+    reverse_tag_iterator() noexcept = default;
+
+    reverse_tag_iterator(
+        const uint8_t* begin,
+        const uint8_t* end) noexcept
+        : begin_(begin), current_(previous(begin, end)), value_(tag_value(current_,end))
+    {
+    }
+
+    reference operator*() const noexcept
+    {
+        return value_;
+    }
+
+    reverse_tag_iterator& operator++() noexcept
+    {
+        const uint8_t* end = current_; 
+        current_ = previous(begin_, current_);
+        value_ = tag_value(current_,end);
+        return *this;
+    }
+
+    reverse_tag_iterator operator++(int) noexcept
+    {
+        auto tmp = *this;
+        ++*this;
+        return tmp;
+    }
+
+    friend bool operator==(
+        const reverse_tag_iterator& a,
+        const reverse_tag_iterator& b) noexcept
+    {
+        return a.current_ == b.current_;
+    }
+};
+
+class cbor_item::tag_view
 {
     const uint8_t* first_{nullptr};
     const uint8_t* stop_{nullptr};
 public:
     using iterator = tag_iterator;
     using const_iterator = tag_iterator;
+    using reverse_iterator = reverse_tag_iterator;
+    using const_reverse_iterator = reverse_tag_iterator;
 
     tag_iterator begin() const noexcept { return tag_iterator(first_, stop_); }
     tag_iterator end() const noexcept { return tag_iterator(); }
+    reverse_tag_iterator rbegin() const noexcept { return reverse_tag_iterator(first_, stop_); }
+    reverse_tag_iterator rend() const noexcept { return reverse_tag_iterator(); }
     bool empty() const noexcept { return first_ == stop_; }
 
 private:
     friend class cbor_item;
-    tag_range(const uint8_t* first, const uint8_t* stop) noexcept : first_(first), stop_(stop) {}
+    tag_view(const uint8_t* first, const uint8_t* stop) noexcept : first_(first), stop_(stop) {}
 };
 
-inline cbor_item::tag_range cbor_item::tags() const noexcept
+inline cbor_item::tag_view cbor_item::tags() const noexcept
 {
     // Leading tags occupy [start of encoding, start of untagged head).
-    return tag_range(bytes_.data(), content_ - ondemand_detail::head_size(head_));
+    return tag_view(bytes_.data(), content_ - ondemand_detail::head_size(head_));
 }
 
 // Iterates an item's children, measuring each once. The last child of a
@@ -1511,11 +1599,12 @@ access_result<std::pair<int64_t,cbor_item>> cbor_item::get_bigdecimal() const no
     {
         return result_type(jsoncons::unexpect, access_errc::invalid_type);
     }
-    uint64_t tag{};
-    for (auto t : tags())
+
+    if (tags().empty())
     {
-        tag = t;
+        return result_type(jsoncons::unexpect, access_errc::invalid_type);
     }
+    uint64_t tag = *(tags().rbegin());
     if (tag != 4)
     {
         return result_type(jsoncons::unexpect, access_errc::invalid_type);
@@ -1570,11 +1659,11 @@ access_result<std::pair<int64_t,cbor_item>> cbor_item::get_bigfloat() const noex
     {
         return result_type(jsoncons::unexpect, access_errc::invalid_type);
     }
-    uint64_t tag{};
-    for (auto t : tags())
+    if (tags().empty())
     {
-        tag = t;
+        return result_type(jsoncons::unexpect, access_errc::invalid_type);
     }
+    uint64_t tag = *(tags().rbegin());
     if (tag != 5)
     {
         return result_type(jsoncons::unexpect, access_errc::invalid_type);
@@ -1626,11 +1715,11 @@ access_result<std::pair<bool,jsoncons::span<const uint8_t>>> cbor_item::get_bign
     using value_type = std::pair<bool,jsoncons::span<const uint8_t>>;
     using result_type = access_result<value_type>;
 
-    uint64_t tag{};
-    for (auto t : tags())
+    if (tags().empty())
     {
-        tag = t;
+        return result_type(jsoncons::unexpect, access_errc::invalid_type);
     }
+    uint64_t tag = *(tags().rbegin());
     if (!(tag == 2 || tag == 3))
     {
         return result_type(jsoncons::unexpect, access_errc::invalid_type);

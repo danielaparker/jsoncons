@@ -1359,7 +1359,7 @@ public:
             return;
         }
         jsoncons::cbor::cbor_major_type major_type = get_major_type(c.value);
-        uint8_t info = get_additional_information(c.value);
+        uint8_t info = get_additional_info(c.value);
         if (JSONCONS_UNLIKELY(info >= 0x1C && info <= 0x1E))
         {
             ec = cbor_errc::reserved_additional_info;
@@ -1889,7 +1889,7 @@ private:
             return byte_string_view();
         }
         jsoncons::cbor::cbor_major_type major_type = get_major_type(c.value);
-        uint8_t info = get_additional_information(c.value);
+        uint8_t info = get_additional_info(c.value);
         if (JSONCONS_UNLIKELY(info >= 0x1C && info <= 0x1E))
         {
             ec = cbor_errc::reserved_additional_info;
@@ -1959,7 +1959,7 @@ private:
             return;
         }
         jsoncons::cbor::cbor_major_type major_type = get_major_type(c.value);
-        uint8_t info = get_additional_information(c.value);
+        uint8_t info = get_additional_info(c.value);
         if (JSONCONS_UNLIKELY(info >= 0x1C && info <= 0x1E))
         {
             ec = cbor_errc::reserved_additional_info;
@@ -2025,7 +2025,7 @@ private:
                 more_ = false;
                 return;
             }
-            uint8_t info = get_additional_information(c.value);
+            uint8_t info = get_additional_info(c.value);
             if (info == jsoncons::cbor::detail::additional_info::indefinite_length)
             {
                 ec = cbor_errc::illegal_chunked_string;
@@ -2089,7 +2089,7 @@ private:
                 more_ = false;
                 return;
             }
-            uint8_t info = get_additional_information(c.value);
+            uint8_t info = get_additional_info(c.value);
             if (info == jsoncons::cbor::detail::additional_info::indefinite_length)
             {
                 ec = cbor_errc::illegal_chunked_string;
@@ -2127,7 +2127,7 @@ private:
         }
 
         jsoncons::cbor::cbor_major_type major_type = get_major_type(ch.value);
-        uint8_t info = get_additional_information(ch.value);
+        uint8_t info = get_additional_info(ch.value);
         if (JSONCONS_UNLIKELY(info >= 0x1C && info <= 0x1E))
         {
             ec = cbor_errc::reserved_additional_info;
@@ -2469,7 +2469,7 @@ private:
         }
         int64_t exponent = 0;
         auto major_type = get_major_type(c.value);
-        auto info = get_additional_information(c.value);
+        auto info = get_additional_info(c.value);
         if (JSONCONS_UNLIKELY(info >= 0x1C && info <= 0x1E))
         {
             ec = cbor_errc::reserved_additional_info;
@@ -2522,7 +2522,7 @@ private:
         }
 
         major_type = get_major_type(c.value);
-        info = get_additional_information(c.value);
+        info = get_additional_info(c.value);
         if (JSONCONS_UNLIKELY(info >= 0x1C && info <= 0x1E))
         {
             ec = cbor_errc::reserved_additional_info;
@@ -2575,7 +2575,7 @@ private:
                     more_ = false;
                     return;
                 }
-                info = get_additional_information(b);
+                info = get_additional_info(b);
                 if (JSONCONS_UNLIKELY(info >= 0x1C && info <= 0x1E))
                 {
                     ec = cbor_errc::reserved_additional_info;
@@ -2645,7 +2645,7 @@ private:
             return;
         }
         jsoncons::cbor::cbor_major_type major_type = get_major_type(c.value);
-        uint8_t info = get_additional_information(c.value);
+        uint8_t info = get_additional_info(c.value);
         if (JSONCONS_UNLIKELY(info >= 0x1C && info <= 0x1E))
         {
             ec = cbor_errc::reserved_additional_info;
@@ -2708,7 +2708,7 @@ private:
             return;
         }
         major_type = get_major_type(c.value);
-        info = get_additional_information(c.value);
+        info = get_additional_info(c.value);
         if (JSONCONS_UNLIKELY(info >= 0x1C && info <= 0x1E))
         {
             ec = cbor_errc::reserved_additional_info;
@@ -2765,7 +2765,7 @@ private:
                     more_ = false;
                     return;
                 }
-                uint8_t tag = get_additional_information(x);
+                uint8_t tag = get_additional_info(x);
                 if (JSONCONS_UNLIKELY(tag >= 0x1C && tag <= 0x1E))
                 {
                     ec = cbor_errc::reserved_additional_info;
@@ -2817,20 +2817,6 @@ private:
         append_to_string(dec, str);
     }
 
-    static jsoncons::cbor::cbor_major_type get_major_type(uint8_t type)
-    {
-        static constexpr uint8_t major_type_shift = 0x05;
-        uint8_t value = type >> major_type_shift;
-        return static_cast<jsoncons::cbor::cbor_major_type>(value);
-    }
-
-    static uint8_t get_additional_information(uint8_t type)
-    {
-        static constexpr uint8_t additional_information_mask = (1U << 5) - 1;
-        uint8_t value = type & additional_information_mask;
-        return value;
-    }
-
     void read_tags(std::error_code& ec)
     {
         auto c = source_.peek();
@@ -2844,7 +2830,7 @@ private:
 
         while (major_type == jsoncons::cbor::cbor_major_type::semantic_tag)
         {
-            uint8_t info = get_additional_information(c.value);
+            uint8_t info = get_additional_info(c.value);
             if (JSONCONS_UNLIKELY(info >= 0x1C && info <= 0x1E))
             {
                 ec = cbor_errc::reserved_additional_info;
@@ -3534,7 +3520,7 @@ private:
 
         jsoncons::cbor::cbor_major_type major_type = get_major_type(initial_byte);
         JSONCONS_ASSERT(major_type == jsoncons::cbor::cbor_major_type::array);
-        uint8_t info = get_additional_information(initial_byte);
+        uint8_t info = get_additional_info(initial_byte);
         if (info != jsoncons::cbor::detail::additional_info::indefinite_length && info != 2)
         {
             ec = cbor_errc::invalid_mdarray_header;
@@ -3568,7 +3554,7 @@ private:
             return;
         }
         major_type = get_major_type(c.value);
-        info = get_additional_information(c.value);
+        info = get_additional_info(c.value);
         if (JSONCONS_UNLIKELY(info >= 0x1C && info <= 0x1E))
         {
             ec = cbor_errc::reserved_additional_info;
@@ -3649,7 +3635,7 @@ private:
             more_ = false;
             return;
         }
-        uint8_t info = get_additional_information(b.value);
+        uint8_t info = get_additional_info(b.value);
         if (JSONCONS_UNLIKELY(info >= 0x1C && info <= 0x1E))
         {
             ec = cbor_errc::reserved_additional_info;
@@ -3684,7 +3670,7 @@ private:
                         return;
                     }
                     source_.ignore(1);
-                    std::size_t extent = read_size(get_additional_information(initial_byte.value), ec);
+                    std::size_t extent = read_size(get_additional_info(initial_byte.value), ec);
                     if (JSONCONS_UNLIKELY(ec))
                     {
                         more_ = false;
@@ -3718,7 +3704,7 @@ private:
                     more_ = false;
                     return;
                 }
-                uint8_t item_info = get_additional_information(initial_byte);
+                uint8_t item_info = get_additional_info(initial_byte);
                 if (JSONCONS_UNLIKELY(item_info >= 0x1C && item_info <= 0x1E))
                 {
                     ec = cbor_errc::reserved_additional_info;

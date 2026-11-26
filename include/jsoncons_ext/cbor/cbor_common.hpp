@@ -35,6 +35,22 @@ enum class cbor_major_type : uint8_t
     simple = 0x7
 };
 
+inline
+jsoncons::cbor::cbor_major_type get_major_type(uint8_t initial_byte)
+{
+    static constexpr uint8_t major_type_shift = 0x05;
+    uint8_t value = initial_byte >> major_type_shift;
+    return static_cast<jsoncons::cbor::cbor_major_type>(value);
+}
+
+inline
+uint8_t get_additional_info(uint8_t initial_byte)
+{
+    static constexpr uint8_t additional_information_mask = (1U << 5) - 1;
+    uint8_t value = initial_byte & additional_information_mask;
+    return value;
+}
+
 namespace detail {
 
 JSONCONS_INLINE_CONSTEXPR uint8_t cbor_array_tags_010_mask = 0xE0;
