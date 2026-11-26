@@ -817,11 +817,13 @@ public:
     class tag_iterator;
     class reverse_tag_iterator;
     class tag_view;
+    class reverse_tag_view;
     class child_iterator;
     class child_range;
 
     // The item's leading tag numbers, outermost first.
     tag_view tags() const noexcept;
+    reverse_tag_view reverse_tags() const noexcept;
 
     // The data items this item is made of: an array's elements, a map's
     // keys and values alternating, or the definite-length chunks of an
@@ -976,6 +978,7 @@ public:
 
 private:
     friend class tag_view;
+    friend class reverse_tag_view;
 
     tag_iterator(const uint8_t* pos, const uint8_t* stop) noexcept
         : pos_(pos), stop_(stop), value_(0)
@@ -1095,8 +1098,6 @@ public:
 
     tag_iterator begin() const noexcept { return tag_iterator(first_, stop_); }
     tag_iterator end() const noexcept { return tag_iterator(); }
-    reverse_tag_iterator rbegin() const noexcept { return reverse_tag_iterator(first_, stop_); }
-    reverse_tag_iterator rend() const noexcept { return reverse_tag_iterator(); }
     bool empty() const noexcept { return first_ == stop_; }
 
 private:
@@ -1104,10 +1105,35 @@ private:
     tag_view(const uint8_t* first, const uint8_t* stop) noexcept : first_(first), stop_(stop) {}
 };
 
+class cbor_item::reverse_tag_view
+{
+    const uint8_t* first_{nullptr};
+    const uint8_t* stop_{nullptr};
+public:
+    using iterator = tag_iterator;
+    using const_iterator = tag_iterator;
+    using reverse_iterator = reverse_tag_iterator;
+    using const_reverse_iterator = reverse_tag_iterator;
+
+    reverse_tag_iterator begin() const noexcept { return reverse_tag_iterator(first_, stop_); }
+    reverse_tag_iterator end() const noexcept { return reverse_tag_iterator(); }
+    bool empty() const noexcept { return first_ == stop_; }
+
+private:
+    friend class cbor_item;
+    reverse_tag_view(const uint8_t* first, const uint8_t* stop) noexcept : first_(first), stop_(stop) {}
+};
+
 inline cbor_item::tag_view cbor_item::tags() const noexcept
 {
     // Leading tags occupy [start of encoding, start of untagged head).
     return tag_view(bytes_.data(), content_ - ondemand_detail::head_size(head_));
+}
+
+inline cbor_item::reverse_tag_view cbor_item::reverse_tags() const noexcept
+{
+    // Leading tags occupy [start of encoding, start of untagged head).
+    return reverse_tag_view(bytes_.data(), content_ - ondemand_detail::head_size(head_));
 }
 
 // Iterates an item's children, measuring each once. The last child of a
@@ -1600,11 +1626,11 @@ access_result<std::pair<int64_t,cbor_item>> cbor_item::get_bigdecimal() const no
         return result_type(jsoncons::unexpect, access_errc::invalid_type);
     }
 
-    if (tags().empty())
+    if (reverse_tags().empty())
     {
         return result_type(jsoncons::unexpect, access_errc::invalid_type);
     }
-    uint64_t tag = *(tags().rbegin());
+    uint64_t tag = *(reverse_tags().begin());
     if (tag != 4)
     {
         return result_type(jsoncons::unexpect, access_errc::invalid_type);
@@ -1659,11 +1685,11 @@ access_result<std::pair<int64_t,cbor_item>> cbor_item::get_bigfloat() const noex
     {
         return result_type(jsoncons::unexpect, access_errc::invalid_type);
     }
-    if (tags().empty())
+    if (reverse_tags().empty())
     {
         return result_type(jsoncons::unexpect, access_errc::invalid_type);
     }
-    uint64_t tag = *(tags().rbegin());
+    uint64_t tag = *(reverse_tags().begin());
     if (tag != 5)
     {
         return result_type(jsoncons::unexpect, access_errc::invalid_type);
@@ -1715,11 +1741,11 @@ access_result<std::pair<bool,jsoncons::span<const uint8_t>>> cbor_item::get_bign
     using value_type = std::pair<bool,jsoncons::span<const uint8_t>>;
     using result_type = access_result<value_type>;
 
-    if (tags().empty())
+    if (reverse_tags().empty())
     {
         return result_type(jsoncons::unexpect, access_errc::invalid_type);
     }
-    uint64_t tag = *(tags().rbegin());
+    uint64_t tag = *(reverse_tags().begin());
     if (!(tag == 2 || tag == 3))
     {
         return result_type(jsoncons::unexpect, access_errc::invalid_type);
