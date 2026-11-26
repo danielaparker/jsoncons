@@ -295,7 +295,10 @@ namespace detail {
 
         void skip_column()
         {
-            ++name_index_;
+            if (level2_ == 0)
+            {
+                ++name_index_;
+            }
         }
         
         int level() const
