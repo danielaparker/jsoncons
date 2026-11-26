@@ -1655,12 +1655,12 @@ access_result<std::pair<int64_t,cbor_item>> cbor_item::get_bigdecimal() const no
         {
             if (child.type() == cbor_type::byte_string)
             {
-                tag = 0;
-                for (auto t : child.tags())
+                if (child.reverse_tags().empty())
                 {
-                    tag = t;
+                    return result_type(jsoncons::unexpect, access_errc::invalid_type);
                 }
-                if (!(tag == 2 || tag == 3))
+                uint64_t child_tag = *(child.reverse_tags().begin());
+                if (!(child_tag == 2 || child_tag == 3))
                 {
                     return result_type(jsoncons::unexpect, access_errc::invalid_type);
                 }
@@ -1714,12 +1714,12 @@ access_result<std::pair<int64_t,cbor_item>> cbor_item::get_bigfloat() const noex
         {
             if (child.type() == cbor_type::byte_string)
             {
-                tag = 0;
-                for (auto t : child.tags())
+                if (child.reverse_tags().empty())
                 {
-                    tag = t;
+                    return result_type(jsoncons::unexpect, access_errc::invalid_type);
                 }
-                if (!(tag == 2 || tag == 3))
+                uint64_t child_tag = *(child.reverse_tags().begin());
+                if (!(child_tag == 2 || child_tag == 3))
                 {
                     return result_type(jsoncons::unexpect, access_errc::invalid_type);
                 }

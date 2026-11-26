@@ -35,6 +35,10 @@ or a simple value's number (the bit pattern of a float).</td>
     <td>Returns the the leading tag numbers, outermost first.</td> 
   </tr>
   <tr>
+    <td><code>reverse_tag_view reverse_tags() const noexcept</code></td>
+    <td>Returns the the leading tag numbers, innermost first.</td> 
+  </tr>
+  <tr>
     <td><code>child_range children() const noexcept</code></td>
     <td>Returns the data items an item is made of, as checked items: an
 array's elements, a map's keys and values alternating, or the definite-length
@@ -85,15 +89,15 @@ indefinite-length strings into the provided buffer.</td>
 indefinite-length strings into the provided buffer.</td> 
   </tr>
   <tr>
-    <td><code>template &lt;typename StringViewLike&gt;<br/>access_result&lt;cbor_view> at(StringViewLike key) const noexcept</code></td>
+    <td><code>template &lt;typename StringViewLike&gt;<br/>access_result&lt;cbor_item> at(StringViewLike key) const noexcept</code></td>
     <td>Returns item if found, otherwise error.</td> 
   </tr>
   <tr>
-    <td><code>access_result&lt;cbor_view> at(const char* key) const noexcept</code></td>
+    <td><code>access_result&lt;cbor_item> at(const char* key) const noexcept</code></td>
     <td>Returns item if found, otherwise error.</td> 
   </tr>
   <tr>
-    <td><code>template &lt;typename UnsignedInteger&gt;<br/>access_result&lt;cbor_view> at(UnsignedInteger key) const noexcept</code></td>
+    <td><code>template &lt;typename UnsignedInteger&gt;<br/>access_result&lt;cbor_item> at(UnsignedInteger key) const noexcept</code></td>
     <td>Returns mapped item from map or indexed item from array if found, otherwise error.</td> 
   </tr>
   <tr>
