@@ -241,6 +241,7 @@ namespace ondemand_detail {
         uint8_t additional_info{0};
         mutable std::atomic<bool> valid_utf8{};
         uint64_t value{0};
+        const uint8_t* content;
 
         item_head() noexcept = default;
 
@@ -440,6 +441,12 @@ namespace ondemand_detail {
         return result_type{jsoncons::in_place, content, static_cast<std::size_t>(head.value)};
     }
 
+    static std::size_t tag_size(uint8_t b) noexcept
+    {
+        unsigned ai = b & 0x1F;
+        return ai < 24 ? 1 : 1 + (1u << (ai - 24));
+    }
+
     JSONCONS_FORCE_INLINE bool read_head(const uint8_t*& p, const uint8_t* end, item_head& head, cbor_errc& ec)
     {
         if (p == end)
@@ -466,34 +473,36 @@ namespace ondemand_detail {
                     ec = cbor_errc::unknown_type;
                     return false;
             }
-            return true;
         }
-        if (!read_uint(p, end, head.additional_info, head.value, ec))
+        else 
         {
-            return false;
+            if (!read_uint(p, end, head.additional_info, head.value, ec))
+                return false;
+            // RFC 8949 3.3: a two-byte encoding of a simple value below 32
+            // is not well-formed.
+            if (head.major_type == cbor::cbor_major_type::simple &&
+                head.additional_info == 24 && head.value < 32)
+            {
+                ec = cbor_errc::unknown_type;
+                return false;
+            }
         }
-        // RFC 8949 3.3: a two-byte encoding of a simple value below 32
-        // is not well-formed.
-        if (head.major_type == cbor::cbor_major_type::simple &&
-            head.additional_info == 24 && head.value < 32)
-        {
-            ec = cbor_errc::unknown_type;
-            return false;
-        }
+
         return true;
     }
 
     // Head of the item's content, past any leading semantic tags.
     JSONCONS_FORCE_INLINE bool read_value_head(const uint8_t*& p, const uint8_t* end, item_head& head, cbor_errc& ec)
     {
-        do
+        while (get_major_type(*p) == cbor_major_type::semantic_tag)
         {
-            if (!read_head(p, end, head, ec))
-            {
-                return false;
-            }
+            p += tag_size(*p);
         }
-        while (head.major_type == cbor::cbor_major_type::semantic_tag);
+        if (!read_head(p, end, head, ec))
+        {
+            return false;
+        }
+
         return true;
     }
 
