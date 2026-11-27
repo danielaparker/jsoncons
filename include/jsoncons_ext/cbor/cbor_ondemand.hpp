@@ -629,7 +629,16 @@ namespace ondemand_detail {
     {
         while (get_major_type(*p) == cbor_major_type::semantic_tag)
         {
-            p += tag_size(*p);
+            std::size_t size = tag_size(*p);
+            if (size == 0)
+            {
+                break;
+            }
+            if ((std::size_t(end - p)) < size)
+            {
+                break;
+            }
+            p += size;
         }
         if (!read_head(p, end, head, ec))
         {
