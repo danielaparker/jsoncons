@@ -32,6 +32,13 @@ namespace jsoncons {
 namespace cbor {
 namespace ondemand {
 
+inline
+std::size_t tag_size(uint8_t initial) noexcept
+{
+    unsigned ai = initial & 0x1F;
+    return ai < 24 ? 1 : 1 + (1u << (ai - 24));
+}
+
 enum class access_errc
 {
     success = 0,
@@ -439,12 +446,6 @@ namespace ondemand_detail {
             return result_type(jsoncons::unexpect, access_errc::indefinite);
         }
         return result_type{jsoncons::in_place, content, static_cast<std::size_t>(head.value)};
-    }
-
-    static std::size_t tag_size(uint8_t b) noexcept
-    {
-        unsigned ai = b & 0x1F;
-        return ai < 24 ? 1 : 1 + (1u << (ai - 24));
     }
 
     JSONCONS_FORCE_INLINE bool read_head(const uint8_t*& p, const uint8_t* end, item_head& head, cbor_errc& ec)
@@ -1019,12 +1020,6 @@ class cbor_item::reverse_tag_iterator
     const uint8_t* begin_ = nullptr;
     const uint8_t* current_ = nullptr;
     std::uint64_t value_{0};
-
-    static std::size_t tag_size(uint8_t b) noexcept
-    {
-        unsigned ai = b & 0x1F;
-        return ai < 24 ? 1 : 1 + (1u << (ai - 24));
-    }
 
     static const uint8_t* previous(const uint8_t* begin, const uint8_t* end) noexcept
     {
