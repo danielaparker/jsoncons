@@ -284,13 +284,19 @@ class reverse_tag_iterator
     const uint8_t* current_ = nullptr;
     std::uint64_t value_{0};
 
-    static const uint8_t* previous(const uint8_t* begin, const uint8_t* /*end*/) noexcept
+    static const uint8_t* previous(const uint8_t* begin, const uint8_t* end) noexcept
     {
         const uint8_t* last = nullptr;
 
-        for (auto p = begin; get_major_type(*p) == cbor_major_type::semantic_tag; p += tag_size(*p))
+        for (auto p = begin; get_major_type(*p) == cbor_major_type::semantic_tag; )
         {
             last = p;
+            std::size_t size = tag_size(*p);
+            if ((std::size_t(end - p)) < size)
+            {
+                break;
+            }
+            p += size;
         }
 
         return last;
@@ -630,10 +636,6 @@ namespace ondemand_detail {
         while (get_major_type(*p) == cbor_major_type::semantic_tag)
         {
             std::size_t size = tag_size(*p);
-            if (size == 0)
-            {
-                break;
-            }
             if ((std::size_t(end - p)) < size)
             {
                 break;
