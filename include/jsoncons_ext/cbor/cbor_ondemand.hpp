@@ -633,6 +633,11 @@ namespace ondemand_detail {
     // Head of the item's content, past any leading semantic tags.
     JSONCONS_FORCE_INLINE bool read_value_head(const uint8_t*& p, const uint8_t* end, item_head& head, cbor_errc& ec)
     {
+        if (p >= end)
+        {
+            ec = cbor_errc::unexpected_eof;
+            return false;
+        }
         while (get_major_type(*p) == cbor_major_type::semantic_tag)
         {
             std::size_t size = tag_size(*p);
